@@ -1,0 +1,137 @@
+import java.util.ArrayList;
+import java.util.InputMismatchException;
+import java.util.List;
+import java.util.Scanner;
+
+class Student {
+    int rollNo;
+    String name;
+    String course;
+    double marks;
+    char grade;
+
+    // Default constructor
+    public Student() {
+    }
+
+    // Parameterized constructor
+    public Student(int rollNo, String name, String course, double marks) {
+        this.rollNo = rollNo;
+        this.name = name;
+        this.course = course;
+        this.marks = marks;
+        this.grade = calculateGrade();
+    }
+
+    // Read details from Scanner (used when adding a student)
+    public void inputDetails(Scanner sc) throws InputMismatchException, IllegalArgumentException {
+        System.out.print("Enter Roll No: ");
+        this.rollNo = sc.nextInt();
+        sc.nextLine(); // consume newline
+
+        System.out.print("Enter Name: ");
+        this.name = sc.nextLine().trim();
+
+        System.out.print("Enter Course: ");
+        this.course = sc.nextLine().trim();
+
+        System.out.print("Enter Marks (0-100): ");
+        this.marks = sc.nextDouble();
+        sc.nextLine();
+
+        // Validate marks
+        if (marks < 0 || marks > 100) {
+            throw new IllegalArgumentException("Marks must be between 0 and 100.");
+        }
+
+        // Calculate grade
+        this.grade = calculateGrade();
+    }
+
+    // Calculate grade based on marks
+    // Mapping used: A: >=90, B: 75-89, C: 50-74, D: <50
+    public char calculateGrade() {
+        if (marks >= 90) return 'A';
+        if (marks >= 75) return 'B';
+        if (marks >= 50) return 'C';
+        return 'D';
+    }
+
+    // Display student details
+    public void displayDetails() {
+        System.out.println("Roll No: " + rollNo);
+        System.out.println("Name   : " + name);
+        System.out.println("Course : " + course);
+        System.out.println("Marks  : " + marks);
+        System.out.println("Grade  : " + grade);
+        System.out.println("-------------------------");
+    }
+}
+
+public class StudentRecordApp {
+    private final List<Student> students = new ArrayList<>();
+    private final Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        new StudentRecordApp().run();
+    }
+
+    private void run() {
+        try {
+            while (true) {
+                System.out.println("===== Student Record Menu =====");
+                System.out.println("1. Add Student");
+                System.out.println("2. Display All Students");
+                System.out.println("3. Exit");
+                System.out.print("Enter your choice: ");
+
+                int choice;
+                try {
+                    choice = sc.nextInt();
+                    sc.nextLine(); // consume newline
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input. Enter a number (1-3).\n");
+                    sc.nextLine(); // clear
+                    continue;
+                }
+
+                switch (choice) {
+                    case 1 -> addStudent();
+                    case 2 -> displayAll();
+                    case 3 -> {
+                        System.out.println("Exiting the application. Goodbye!");
+                        return;
+                    }
+                    default -> System.out.println("Invalid choice. Try again.\n");
+                }
+            }
+        } finally {
+            sc.close();
+        }
+    }
+
+    private void addStudent() {
+        Student s = new Student();
+        try {
+            s.inputDetails(sc);
+            students.add(s);
+            System.out.println("Student added successfully.\n");
+        } catch (InputMismatchException ime) {
+            System.out.println("Input type error. Please enter correct data types.\n");
+            sc.nextLine(); // clear buffer
+        } catch (IllegalArgumentException iae) {
+            System.out.println("Error: " + iae.getMessage() + "\n");
+        } catch (Exception e) {
+            System.out.println("Unexpected error: " + e.getMessage() + "\n");
+        }
+    }
+
+    private void displayAll() {
+        if (students.isEmpty()) {
+            System.out.println("No student records available.\n");
+            return;
+        }
+        System.out.println("=== Student Records ===");
+        for (Student s : students) s.displayDetails();
+    }
+}
